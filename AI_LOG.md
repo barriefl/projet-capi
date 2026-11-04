@@ -5,11 +5,12 @@
 
 ## Outils utilisés (à remplir une fois)
 
-| Outil | Modèle (si connu) | Mode (autocomplétion, chat, agent) |
-| ----- | ----------------- | ---------------------------------- |
-|       |                   |                                    |
+| Outil  | Modèle (si connu) | Mode (autocomplétion, chat, agent) |
+| ------ | ----------------- | ---------------------------------- |
+| Claude | Sonnet            | Autocomplétion & Chat              |
+| Gemini | Flash & Pro       | Autocomplétion & Chat              |
 
-Fichier d'instructions pour agent versionné (`CLAUDE.md`, `AGENTS.md`...) : <oui : chemin / non>
+Fichier d'instructions pour agent versionné (`CLAUDE.md`, `AGENTS.md`...) : Non.
 
 ## Entrées
 
