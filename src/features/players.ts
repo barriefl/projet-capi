@@ -1,9 +1,9 @@
 import type { Player } from './role';
 
 export const MIN_PLAYERS = 2;
+export const MAX_PLAYERS = 10;
 
-export function creatPlayer(pseudos: string []): Player[] {
-
+export function createPlayer(pseudos: string []): Player[] {
     if (pseudos.length < MIN_PLAYERS) {
         throw new Error(`Le nombre de joueurs doit être supérieur ou égal à ${MIN_PLAYERS}`);
     }
