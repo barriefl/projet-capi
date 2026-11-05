@@ -4,12 +4,25 @@ import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
 import type { Player, Backlog } from './features'
 import { getComplexityLevel } from './features/backlog'
+import { CARDS, selectCard } from './features/cards'
+import type { Card, Vote } from './features/cards'
 
+const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
 const backlog = ref<Backlog | null>(null)
+
 const allComplexities = computed(() => {
   return backlog.value?.fonctionnalites.map((f) => f.complexite) ?? []
 })
+
+function vote(playerId: number, card:Card) {
+  votes.value = selectCard(votes.value, playerId, card)
+}
+
+function verifVote(playerId: number, card:Card): boolean {
+  return votes.value.some((v) => v.playerId === playerId && v.card === card)
+}
+
 function getBadgeClass(complexite: number | null): string {
   const level = getComplexityLevel(complexite, allComplexities.value)
   return `badge-${level}`
@@ -49,6 +62,26 @@ function getBadgeClass(complexite: number | null): string {
           </li>
         </ul>
       </section>
+
+      <!-- 3. Vote -->
+      <section v-if="backlog" class="card">
+      <h2>Vote</h2>
+      <div v-for="p in players" :key="p.id" class="vote-row">
+        <strong class="vote-player">{{ p.pseudo }}</strong>
+        <button
+          v-for="c in CARDS"
+          :key="c"
+          type="button"
+          :class="['poker-card', { selected: verifVote(p.id, c) }]"
+          @click="vote(p.id, c)"
+        >
+          {{ c }}
+        </button>
+      </div>
+
+      <pre>{{ votes }}</pre>
+    </section>
+
     </template>
   </main>
 </template>
@@ -145,5 +178,32 @@ function getBadgeClass(complexite: number | null): string {
 .badge-high {
   background: #fce8e6;
   color: #c5221f;
+}
+
+.vote-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.vote-player {
+  min-width: 6rem;
+}
+
+.poker-card {
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.poker-card.selected {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
 }
 </style>

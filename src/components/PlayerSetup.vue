@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { createPlayer, MIN_PLAYERS, MAX_PLAYERS } from '../features/players'
-import type { Player } from '../features/role'
+import type { Player } from '../features/players'
 
 // On définit les props et les événements émis par le composant
 // ce qui veut dire que le composant peut recevoir une liste initiale de joueurs 
