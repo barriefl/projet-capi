@@ -21,7 +21,11 @@ Fichier d'instructions pour agent versionné (`CLAUDE.md`, `AGENTS.md`...) : Non
 - **Ce que nous avons vérifié** : <tests lancés, lecture ligne à ligne, essai manuel...>
 - **Ce que nous avons changé ou rejeté, et pourquoi** :
 
-### AAAA-MM-JJ : ...
+### 2026-11-04 : Générer l'interface pour l'ajout de joueurs (US-07)
+- **Demande (résumé fidèle)** : J'ai demandé une interface pour visualiser ce que nous avons fait pour l'US 07. Contexte : je lui ai fourni le fichier role.ts et players.ts
+- **Résultat** : Modifié
+- **Ce que nous avons vérifié** : Lecture ligne à ligne et essai manuel
+- **Ce que nous avons changé ou rejeté, et pourquoi** : Ajout d'un nombre de max de joueurs, et suppression de features non demandées que l'IA avait rajoutées (exemple : modification des pseudos après validation)
 
 ## Bilan (à compléter en séance 4, 3 lignes)
 
