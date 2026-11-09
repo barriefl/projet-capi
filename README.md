@@ -1,4 +1,5 @@
 # Projet CAPI
+[![CI](https://github.com/barriefl/projet-capi/actions/workflows/ci.yml/badge.svg)](https://github.com/barriefl/projet-capi/actions/workflows/ci.yml)
 
 ## Installation
 
