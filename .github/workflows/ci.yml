@@ -1,0 +1,27 @@
+# Nom du workflow affiché dans GitHub Actions.
+name: CI
+
+# Actions permettant de déclencher le workflow (push ou pull sur la branche main).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Permissions minimales pour faire l'action.
+permissions:
+  contents: read
+
+# Tâches à réaliser.
+jobs:
+  test:
+    # Machine virtuelle.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "22.x"
+          cache: 'npm'
+      - run: npm ci
+      - run: npx vitest run
