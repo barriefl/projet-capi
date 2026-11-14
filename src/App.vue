@@ -2,12 +2,27 @@
 import { ref, computed } from 'vue'
 import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
-import type { Player, Backlog, Card, Vote } from './features'
-import { getComplexityLevel, CARDS, selectCard, allPlayersVoted, getVote } from './features'
+import type { Player, Backlog, Card, Vote, Regle, Resultat } from './features'
+import { getComplexityLevel, CARDS, selectCard, allPlayersVoted, getVote, testResultat } from './features'
 
 const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
 const backlog = ref<Backlog | null>(null)
+const tour = ref<number>(1)
+
+const resultat = computed(() =>
+  everyoneVoted.value ? testResultat(votes.value.map((v) => v.card), 'majorite_absolue', tour.value) : null
+)
+
+function nextTour() {
+ if (resultat.value?.statut === 'valide') {
+    currentFeature.value!.complexite = resultat.value.complexite
+    tour.value = 1
+  } else {
+    tour.value++
+  }
+  votes.value = []
+}
   
 const everyoneVoted = computed(() =>
   players.value ? allPlayersVoted(votes.value, players.value.map((p) => p.id)) : false
@@ -99,7 +114,10 @@ function getBadgeClass(complexite: number | null): string {
                 {{ p.pseudo }} : {{ getVote(votes, p.id) }}
               </li>
           </ul>
-          <button type="button" class="btn" @click="votes = []">Revoter</button>
+          <p v-if="resultat?.statut === 'valide'">Complexité de la tâche : {{ resultat.complexite }}</p>
+          <button type="button" class="btn" @click="nextTour">
+            {{ resultat?.statut === 'valide' ? 'Suivant' : 'Revoter' }}
+          </button>
         </template>
         </template>
       </section>
