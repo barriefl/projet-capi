@@ -2,17 +2,19 @@
 import { ref, computed } from 'vue'
 import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
-import type { Player, Backlog } from './features'
-import { getComplexityLevel } from './features/backlog'
-import { CARDS, selectCard } from './features/cards'
-import type { Card, Vote } from './features/cards'
+import type { Player, Backlog, Card, Vote } from './features'
+import { getComplexityLevel, CARDS, selectCard, allPlayersVoted, getVote } from './features'
 
 const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
 const backlog = ref<Backlog | null>(null)
   
+const everyoneVoted = computed(() =>
+  players.value ? allPlayersVoted(votes.value, players.value.map((p) => p.id)) : false
+)
+
 const currentPlayer = computed(() => {
-  return players.value?.find((p) => !votes.value.some((v) => v.playerId === p.id)) ?? null
+  return players.value?.find((p) => getVote(votes.value, p.id) === undefined) ?? null
 })
 
 const currentFeature = computed(() =>
@@ -91,11 +93,11 @@ function getBadgeClass(complexite: number | null): string {
           </button>
         </div>
 
-        <template v-else>
+        <template v-else-if="everyoneVoted">
           <ul class="players">
-            <li v-for="v in votes" :key="v.playerId">
-              {{ players.find((p) => p.id === v.playerId)?.pseudo }} : {{ v.card }}
-            </li>
+              <li v-for="p in players" :key="p.id">
+                {{ p.pseudo }} : {{ getVote(votes, p.id) }}
+              </li>
           </ul>
           <button type="button" class="btn" @click="votes = []">Revoter</button>
         </template>
