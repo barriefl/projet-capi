@@ -2,14 +2,39 @@
 import { ref, computed } from 'vue'
 import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
-import type { Player, Backlog } from './features'
-import { getComplexityLevel } from './features/backlog'
-import { CARDS, selectCard } from './features/cards'
-import type { Card, Vote } from './features/cards'
+import type { Player, Backlog, Card, Vote, Regle, Resultat } from './features'
+import { getComplexityLevel, CARDS, selectCard, allPlayersVoted, getVote, testResultat } from './features'
 
 const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
 const backlog = ref<Backlog | null>(null)
+const tour = ref<number>(1)
+
+const resultat = computed(() =>
+  everyoneVoted.value ? testResultat(votes.value.map((v) => v.card), 'majorite_absolue', tour.value) : null
+)
+
+function nextTour() {
+ if (resultat.value?.statut === 'valide') {
+    currentFeature.value!.complexite = resultat.value.complexite
+    tour.value = 1
+  } else {
+    tour.value++
+  }
+  votes.value = []
+}
+  
+const everyoneVoted = computed(() =>
+  players.value ? allPlayersVoted(votes.value, players.value.map((p) => p.id)) : false
+)
+
+const currentPlayer = computed(() => {
+  return players.value?.find((p) => getVote(votes.value, p.id) === undefined) ?? null
+})
+
+const currentFeature = computed(() =>
+  backlog.value?.fonctionnalites.find((f) => f.complexite === null) ?? null
+)
 
 const allComplexities = computed(() => {
   return backlog.value?.fonctionnalites.map((f) => f.complexite) ?? []
@@ -17,10 +42,6 @@ const allComplexities = computed(() => {
 
 function vote(playerId: number, card:Card) {
   votes.value = selectCard(votes.value, playerId, card)
-}
-
-function verifVote(playerId: number, card:Card): boolean {
-  return votes.value.some((v) => v.playerId === playerId && v.card === card)
 }
 
 function getBadgeClass(complexite: number | null): string {
@@ -66,21 +87,40 @@ function getBadgeClass(complexite: number | null): string {
       <!-- 3. Vote -->
       <section v-if="backlog" class="card">
       <h2>Vote</h2>
-      <div v-for="p in players" :key="p.id" class="vote-row">
-        <strong class="vote-player">{{ p.pseudo }}</strong>
-        <button
-          v-for="c in CARDS"
-          :key="c"
-          type="button"
-          :class="['poker-card', { selected: verifVote(p.id, c) }]"
-          @click="vote(p.id, c)"
-        >
-          {{ c }}
-        </button>
-      </div>
 
-      <pre>{{ votes }}</pre>
-    </section>
+        <template v-if="currentFeature">
+          <!-- Tâche en cours d'estimation -->
+          <p class="feature-content">
+            <span class="feature-id">[{{ currentFeature.id }}]</span>
+            <span class="feature-title">{{ currentFeature.titre }}</span>
+          </p>
+        
+        <div v-if="currentPlayer" class="vote-row">
+          <strong class="vote-player">Au tour de {{ currentPlayer.pseudo }}</strong>
+          <button
+            v-for="c in CARDS"
+            :key="c"
+            type="button"
+            class="poker-card"
+            @click="vote(currentPlayer.id, c)"
+          >
+            {{ c }}
+          </button>
+        </div>
+
+        <template v-else-if="everyoneVoted">
+          <ul class="players">
+              <li v-for="p in players" :key="p.id">
+                {{ p.pseudo }} : {{ getVote(votes, p.id) }}
+              </li>
+          </ul>
+          <p v-if="resultat?.statut === 'valide'">Complexité de la tâche : {{ resultat.complexite }}</p>
+          <button type="button" class="btn" @click="nextTour">
+            {{ resultat?.statut === 'valide' ? 'Suivant' : 'Revoter' }}
+          </button>
+        </template>
+        </template>
+      </section>
 
     </template>
   </main>

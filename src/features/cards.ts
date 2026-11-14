@@ -19,3 +19,14 @@ export function selectCard(votes: Vote[], playerId: number, card: Card): Vote[] 
   return [...otherVotes, newVote]
 
 }
+
+// on compare la liste des votes avec la liste des joueurs pour savoir si tous les joueurs ont voté
+export function allPlayersVoted(votes: Vote[], playerIds: number[]): boolean {
+  return playerIds.every((playerId) => votes.some((vote) => vote.playerId === playerId))
+}
+
+// on récupère la carte du joueur à partir de la liste des votes en fonction de son id
+export function getVote(votes: Vote[], playerId: number): Card | undefined {
+  const vote = votes.find((vote) => vote.playerId === playerId)
+  return vote?.card
+}

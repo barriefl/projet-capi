@@ -35,6 +35,8 @@ Fichier d'instructions pour agent versionné (`CLAUDE.md`, `AGENTS.md`...) : Non
 - **Ce que nous avons vérifié** : Lecture ligne à ligne + tests à la main des tests de l'import du backlog grâce à `newBacklog.json`, `backlog.json` et `badBacklog.json` dans le dossier `/exemples`.
 - **Ce que nous avons changé ou rejeté, et pourquoi** : J'ai demandé un ajout de quartiles afin de donner une couleur intuitive et dynamique à la complexité des fonctionnalités du backlog.
 
+### 2026-11-13 : Utilisation de l'autocomplétion sur VsCode lors du développement de l'US (US-08).
+
 ## Bilan (à compléter en séance 4, 3 lignes)
 
 - Nombre d'entrées et de propositions rejetées ou corrigées :
