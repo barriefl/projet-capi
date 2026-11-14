@@ -106,3 +106,5 @@ export function getComplexityLevel(
   if (value <= q2) return 'medium'
   return 'high'
 }
+
+export type Resultat = { statut: 'valide'; complexite: number } | { statut: 'revote' }

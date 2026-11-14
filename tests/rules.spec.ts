@@ -1,11 +1,5 @@
 import { describe, expect, test } from 'vitest'
-
-type Regle = 'stricte' | 'majorite_absolue'
-type Resultat = | {statut: 'valide' ; complexite: number } | {statut: 'revote'}
-
-function testResultat(votes: number[], regle: Regle, tour: number): Resultat {
-  throw new Error('la fonction testResultat n\'est pas encore implémentée')
-}
+import { testResultat } from '../src/features/regles'
 
 describe('Règle stricte', () => {
   test('test_CA_01_1_strict_premier_tour', () => {
@@ -15,7 +9,7 @@ describe('Règle stricte', () => {
     // Act
     const resultat = testResultat(votes, 'stricte', 1)
     // Assert
-    expect(resultat).toEqual({statut: 'valide', complexite: 5})
+    expect(resultat).toEqual({ statut: 'valide', complexite: 5 })
   })
 
   test('test_CA_01_1_strict_premier_tour_revote', () => {
@@ -25,7 +19,7 @@ describe('Règle stricte', () => {
     // Act
     const resultat = testResultat(votes, 'stricte', 1)
     // Assert
-    expect(resultat).toEqual({statut: 'revote'})
+    expect(resultat).toEqual({ statut: 'revote' })
   })
 })
 
@@ -36,7 +30,7 @@ describe('Règle de la majorité absolue', () => {
     // Act
     const resultat = testResultat(votes, 'majorite_absolue', 1)
     // Assert
-    expect(resultat).toEqual({statut: 'revote'})
+    expect(resultat).toEqual({ statut: 'revote' })
   })
 
   test('test_CA_02_1_maj_absolue_second_tour', () => {
@@ -46,7 +40,7 @@ describe('Règle de la majorité absolue', () => {
     // Act
     const resultat = testResultat(votes, 'majorite_absolue', 2)
     // Assert
-    expect(resultat).toEqual({statut: 'valide', complexite: 13})
+    expect(resultat).toEqual({ statut: 'valide', complexite: 13 })
   })
 
   test('test_CA_03_1_maj_absolue_unanimite_premier_tour', () => {
@@ -55,15 +49,15 @@ describe('Règle de la majorité absolue', () => {
     // Act
     const resultat = testResultat(votes, 'majorite_absolue', 1)
     // Assert
-    expect(resultat).toEqual({statut: 'valide', complexite: 13})
+    expect(resultat).toEqual({ statut: 'valide', complexite: 13 })
   })
 
-    test('test_CA_03_1_maj_absolue_pas_unanimite_premier_tour_revote', () => {
+  test('test_CA_03_1_maj_absolue_pas_unanimite_premier_tour_revote', () => {
     // Arrange
     const votes = [13, 13, 13, 20]
     // Act
     const resultat = testResultat(votes, 'majorite_absolue', 1)
     // Assert
-    expect(resultat).toEqual({statut: 'revote'})
+    expect(resultat).toEqual({ statut: 'revote' })
   })
 })
