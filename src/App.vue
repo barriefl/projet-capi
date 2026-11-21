@@ -2,8 +2,16 @@
 import { ref, computed } from 'vue'
 import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
+import BacklogExport from './components/BacklogExport.vue'
 import type { Player, Backlog, Card, Vote, Regle, Resultat } from './features'
-import { getComplexityLevel, CARDS, selectCard, allPlayersVoted, getVote, testResultat } from './features'
+import {
+  getComplexityLevel,
+  CARDS,
+  selectCard,
+  allPlayersVoted,
+  getVote,
+  testResultat,
+} from './features'
 
 const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
@@ -11,11 +19,17 @@ const backlog = ref<Backlog | null>(null)
 const tour = ref<number>(1)
 
 const resultat = computed(() =>
-  everyoneVoted.value ? testResultat(votes.value.map((v) => v.card), 'majorite_absolue', tour.value) : null
+  everyoneVoted.value
+    ? testResultat(
+        votes.value.map((v) => v.card),
+        'majorite_absolue',
+        tour.value,
+      )
+    : null,
 )
 
 function nextTour() {
- if (resultat.value?.statut === 'valide') {
+  if (resultat.value?.statut === 'valide') {
     currentFeature.value!.complexite = resultat.value.complexite
     tour.value = 1
   } else {
@@ -23,24 +37,29 @@ function nextTour() {
   }
   votes.value = []
 }
-  
+
 const everyoneVoted = computed(() =>
-  players.value ? allPlayersVoted(votes.value, players.value.map((p) => p.id)) : false
+  players.value
+    ? allPlayersVoted(
+        votes.value,
+        players.value.map((p) => p.id),
+      )
+    : false,
 )
 
 const currentPlayer = computed(() => {
   return players.value?.find((p) => getVote(votes.value, p.id) === undefined) ?? null
 })
 
-const currentFeature = computed(() =>
-  backlog.value?.fonctionnalites.find((f) => f.complexite === null) ?? null
+const currentFeature = computed(
+  () => backlog.value?.fonctionnalites.find((f) => f.complexite === null) ?? null,
 )
 
 const allComplexities = computed(() => {
   return backlog.value?.fonctionnalites.map((f) => f.complexite) ?? []
 })
 
-function vote(playerId: number, card:Card) {
+function vote(playerId: number, card: Card) {
   votes.value = selectCard(votes.value, playerId, card)
 }
 
@@ -70,7 +89,11 @@ function getBadgeClass(complexite: number | null): string {
       <BacklogImport v-if="!backlog" @imported="backlog = $event" />
 
       <section v-else class="card">
-        <h2>Projet : {{ backlog.projet }}</h2>
+        <div class="backlog-header">
+          <h2>Projet : {{ backlog.projet }}</h2>
+          <BacklogExport :backlog="backlog" />
+        </div>
+
         <ul class="backlog-list">
           <li v-for="item in backlog.fonctionnalites" :key="item.id" class="feature-item">
             <div class="feature-content">
@@ -86,7 +109,7 @@ function getBadgeClass(complexite: number | null): string {
 
       <!-- 3. Vote -->
       <section v-if="backlog" class="card">
-      <h2>Vote</h2>
+        <h2>Vote</h2>
 
         <template v-if="currentFeature">
           <!-- Tâche en cours d'estimation -->
@@ -94,34 +117,33 @@ function getBadgeClass(complexite: number | null): string {
             <span class="feature-id">[{{ currentFeature.id }}]</span>
             <span class="feature-title">{{ currentFeature.titre }}</span>
           </p>
-        
-        <div v-if="currentPlayer" class="vote-row">
-          <strong class="vote-player">Au tour de {{ currentPlayer.pseudo }}</strong>
-          <button
-            v-for="c in CARDS"
-            :key="c"
-            type="button"
-            class="poker-card"
-            @click="vote(currentPlayer.id, c)"
-          >
-            {{ c }}
-          </button>
-        </div>
 
-        <template v-else-if="everyoneVoted">
-          <ul class="players">
-              <li v-for="p in players" :key="p.id">
-                {{ p.pseudo }} : {{ getVote(votes, p.id) }}
-              </li>
-          </ul>
-          <p v-if="resultat?.statut === 'valide'">Complexité de la tâche : {{ resultat.complexite }}</p>
-          <button type="button" class="btn" @click="nextTour">
-            {{ resultat?.statut === 'valide' ? 'Suivant' : 'Revoter' }}
-          </button>
-        </template>
+          <div v-if="currentPlayer" class="vote-row">
+            <strong class="vote-player">Au tour de {{ currentPlayer.pseudo }}</strong>
+            <button
+              v-for="c in CARDS"
+              :key="c"
+              type="button"
+              class="poker-card"
+              @click="vote(currentPlayer.id, c)"
+            >
+              {{ c }}
+            </button>
+          </div>
+
+          <template v-else-if="everyoneVoted">
+            <ul class="players">
+              <li v-for="p in players" :key="p.id">{{ p.pseudo }} : {{ getVote(votes, p.id) }}</li>
+            </ul>
+            <p v-if="resultat?.statut === 'valide'">
+              Complexité de la tâche : {{ resultat.complexite }}
+            </p>
+            <button type="button" class="btn" @click="nextTour">
+              {{ resultat?.statut === 'valide' ? 'Suivant' : 'Revoter' }}
+            </button>
+          </template>
         </template>
       </section>
-
     </template>
   </main>
 </template>
@@ -146,6 +168,18 @@ function getBadgeClass(complexite: number | null): string {
 }
 
 /* Backlog. */
+.backlog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.backlog-header h2 {
+  margin: 0;
+}
+
 .backlog-list {
   list-style: none;
   padding: 0;
