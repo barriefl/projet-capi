@@ -3,19 +3,33 @@ import { ref, computed } from 'vue'
 import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
 import type { Player, Backlog, Card, Vote, Regle, Resultat } from './features'
-import { getComplexityLevel, CARDS, selectCard, allPlayersVoted, getVote, testResultat } from './features'
+import {
+  getComplexityLevel,
+  CARDS,
+  selectCard,
+  allPlayersVoted,
+  getVote,
+  testResultat,
+} from './features'
 
 const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
 const backlog = ref<Backlog | null>(null)
 const tour = ref<number>(1)
+const regle = ref<Regle>('stricte')
 
 const resultat = computed(() =>
-  everyoneVoted.value ? testResultat(votes.value.map((v) => v.card), 'majorite_absolue', tour.value) : null
+  everyoneVoted.value
+    ? testResultat(
+        votes.value.map((v) => v.card),
+        regle.value,
+        tour.value,
+      )
+    : null,
 )
 
 function nextTour() {
- if (resultat.value?.statut === 'valide') {
+  if (resultat.value?.statut === 'valide') {
     currentFeature.value!.complexite = resultat.value.complexite
     tour.value = 1
   } else {
@@ -23,24 +37,29 @@ function nextTour() {
   }
   votes.value = []
 }
-  
+
 const everyoneVoted = computed(() =>
-  players.value ? allPlayersVoted(votes.value, players.value.map((p) => p.id)) : false
+  players.value
+    ? allPlayersVoted(
+        votes.value,
+        players.value.map((p) => p.id),
+      )
+    : false,
 )
 
 const currentPlayer = computed(() => {
   return players.value?.find((p) => getVote(votes.value, p.id) === undefined) ?? null
 })
 
-const currentFeature = computed(() =>
-  backlog.value?.fonctionnalites.find((f) => f.complexite === null) ?? null
+const currentFeature = computed(
+  () => backlog.value?.fonctionnalites.find((f) => f.complexite === null) ?? null,
 )
 
 const allComplexities = computed(() => {
   return backlog.value?.fonctionnalites.map((f) => f.complexite) ?? []
 })
 
-function vote(playerId: number, card:Card) {
+function vote(playerId: number, card: Card) {
   votes.value = selectCard(votes.value, playerId, card)
 }
 
@@ -64,6 +83,14 @@ function getBadgeClass(complexite: number | null): string {
         <ul class="players">
           <li v-for="p in players" :key="p.id">{{ p.pseudo }}</li>
         </ul>
+
+        <div class="rule-selector">
+          <label for="regle-select"><strong>Règle de validation :</strong></label>
+          <select id="regle-select" v-model="regle" :disabled="votes.length > 0 || tour > 1">
+            <option value="stricte">Stricte (unanimité requise)</option>
+            <option value="majorite_absolue">Majorité absolue (unanimité au tour 1)</option>
+          </select>
+        </div>
       </section>
 
       <!-- 2. Import du backlog. -->
@@ -86,7 +113,10 @@ function getBadgeClass(complexite: number | null): string {
 
       <!-- 3. Vote -->
       <section v-if="backlog" class="card">
-      <h2>Vote</h2>
+        <div class="vote-header">
+          <h2>Vote</h2>
+          <span v-if="currentFeature" class="tour-badge">Tour {{ tour }}</span>
+        </div>
 
         <template v-if="currentFeature">
           <!-- Tâche en cours d'estimation -->
@@ -94,34 +124,33 @@ function getBadgeClass(complexite: number | null): string {
             <span class="feature-id">[{{ currentFeature.id }}]</span>
             <span class="feature-title">{{ currentFeature.titre }}</span>
           </p>
-        
-        <div v-if="currentPlayer" class="vote-row">
-          <strong class="vote-player">Au tour de {{ currentPlayer.pseudo }}</strong>
-          <button
-            v-for="c in CARDS"
-            :key="c"
-            type="button"
-            class="poker-card"
-            @click="vote(currentPlayer.id, c)"
-          >
-            {{ c }}
-          </button>
-        </div>
 
-        <template v-else-if="everyoneVoted">
-          <ul class="players">
-              <li v-for="p in players" :key="p.id">
-                {{ p.pseudo }} : {{ getVote(votes, p.id) }}
-              </li>
-          </ul>
-          <p v-if="resultat?.statut === 'valide'">Complexité de la tâche : {{ resultat.complexite }}</p>
-          <button type="button" class="btn" @click="nextTour">
-            {{ resultat?.statut === 'valide' ? 'Suivant' : 'Revoter' }}
-          </button>
-        </template>
+          <div v-if="currentPlayer" class="vote-row">
+            <strong class="vote-player">Au tour de {{ currentPlayer.pseudo }}</strong>
+            <button
+              v-for="c in CARDS"
+              :key="c"
+              type="button"
+              class="poker-card"
+              @click="vote(currentPlayer.id, c)"
+            >
+              {{ c }}
+            </button>
+          </div>
+
+          <template v-else-if="everyoneVoted">
+            <ul class="players">
+              <li v-for="p in players" :key="p.id">{{ p.pseudo }} : {{ getVote(votes, p.id) }}</li>
+            </ul>
+            <p v-if="resultat?.statut === 'valide'">
+              Complexité de la tâche : {{ resultat.complexite }}
+            </p>
+            <button type="button" class="btn" @click="nextTour">
+              {{ resultat?.statut === 'valide' ? 'Suivant' : 'Revoter' }}
+            </button>
+          </template>
         </template>
       </section>
-
     </template>
   </main>
 </template>
@@ -245,5 +274,40 @@ function getBadgeClass(complexite: number | null): string {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
+}
+
+.rule-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.rule-selector select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+}
+
+.vote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.vote-header h2 {
+  margin: 0;
+}
+
+.tour-badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(91, 75, 219, 0.12);
+  color: var(--primary);
 }
 </style>
