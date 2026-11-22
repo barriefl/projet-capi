@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import PlayerSetup from './components/PlayerSetup.vue'
 import BacklogImport from './components/BacklogImport.vue'
+import BacklogExport from './components/BacklogExport.vue'
 import type { Player, Backlog, Card, Vote, Regle, Resultat } from './features'
 import {
   getComplexityLevel,
@@ -97,7 +98,11 @@ function getBadgeClass(complexite: number | null): string {
       <BacklogImport v-if="!backlog" @imported="backlog = $event" />
 
       <section v-else class="card">
-        <h2>Projet : {{ backlog.projet }}</h2>
+        <div class="backlog-header">
+          <h2>Projet : {{ backlog.projet }}</h2>
+          <BacklogExport :backlog="backlog" />
+        </div>
+
         <ul class="backlog-list">
           <li v-for="item in backlog.fonctionnalites" :key="item.id" class="feature-item">
             <div class="feature-content">
@@ -175,6 +180,18 @@ function getBadgeClass(complexite: number | null): string {
 }
 
 /* Backlog. */
+.backlog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.backlog-header h2 {
+  margin: 0;
+}
+
 .backlog-list {
   list-style: none;
   padding: 0;

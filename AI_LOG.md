@@ -37,12 +37,18 @@ Fichier d'instructions pour agent versionné (`CLAUDE.md`, `AGENTS.md`...) : Non
 
 ### 2026-11-13 : Utilisation de l'autocomplétion sur VsCode lors du développement de l'US (US-08).
 
+### 2026-11-21 : Générer l'interface pour l'export du backlog (US-09).
+
+- **Demande (résumé fidèle)** : Je lui ai demandé de me générer une interface pour l'exportation du backlog.<br> Contexte : Il a reçu le fichier `backlog.ts`.<br> Il a généré `BacklogExport.vue` ainsi que du CSS et du code pour le fichier `App.vue`.
+- **Résultat** : Accepté comme tel, l'interface est correcte et conforme au reste du site.
+- **Ce que nous avons vérifié** : Lecture ligne à ligne + tests à la main des tests de l'export du backlog.
+
 ### 2026-11-21 : Générer l'interface pour la sélection de règles lors du début de partie (US-01).
 
 - **Demande (résumé fidèle)** : Je lui ai demandé de me générer une interface pour choisir ma règle de planning poker.<br> Contexte : Il a reçu le fichier `App.vue`.<br> Il a généré du CSS et du code à intégrer dans le fichier existant.
 - **Résultat** : Accepté comme tel.
 - **Ce que nous avons vérifié** : Lecture ligne à ligne + tests à la main du sélecteur de règles.
-- **Ce que nous avons changé ou rejeté, et pourquoi** : //
+
 
 ## Bilan (à compléter en séance 4, 3 lignes)
 

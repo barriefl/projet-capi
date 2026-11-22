@@ -108,3 +108,22 @@ export function getComplexityLevel(
 }
 
 export type Resultat = { statut: 'valide'; complexite: number } | { statut: 'revote' }
+
+export function serializeBacklog(backlog: Backlog): string {
+  // On ne sérialise que les champs nécessaires.
+  const fonctionnalites = backlog.fonctionnalites.map((f) => ({
+    id: f.id,
+    titre: f.titre,
+    complexite: f.complexite,
+  }))
+
+  // Formattage du JSON avec une indention de 2 espaces.
+  return JSON.stringify(
+    {
+      projet: backlog.projet,
+      fonctionnalites,
+    },
+    null,
+    2,
+  )
+}
