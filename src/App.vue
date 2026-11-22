@@ -17,12 +17,13 @@ const votes = ref<Vote[]>([])
 const players = ref<Player[] | null>(null)
 const backlog = ref<Backlog | null>(null)
 const tour = ref<number>(1)
+const regle = ref<Regle>('stricte')
 
 const resultat = computed(() =>
   everyoneVoted.value
     ? testResultat(
         votes.value.map((v) => v.card),
-        'majorite_absolue',
+        regle.value,
         tour.value,
       )
     : null,
@@ -83,6 +84,14 @@ function getBadgeClass(complexite: number | null): string {
         <ul class="players">
           <li v-for="p in players" :key="p.id">{{ p.pseudo }}</li>
         </ul>
+
+        <div class="rule-selector">
+          <label for="regle-select"><strong>Règle de validation :</strong></label>
+          <select id="regle-select" v-model="regle" :disabled="votes.length > 0 || tour > 1">
+            <option value="stricte">Stricte (unanimité requise)</option>
+            <option value="majorite_absolue">Majorité absolue (unanimité au tour 1)</option>
+          </select>
+        </div>
       </section>
 
       <!-- 2. Import du backlog. -->
@@ -109,7 +118,10 @@ function getBadgeClass(complexite: number | null): string {
 
       <!-- 3. Vote -->
       <section v-if="backlog" class="card">
-        <h2>Vote</h2>
+        <div class="vote-header">
+          <h2>Vote</h2>
+          <span v-if="currentFeature" class="tour-badge">Tour {{ tour }}</span>
+        </div>
 
         <template v-if="currentFeature">
           <!-- Tâche en cours d'estimation -->
@@ -279,5 +291,40 @@ function getBadgeClass(complexite: number | null): string {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
+}
+
+.rule-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.rule-selector select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+}
+
+.vote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.vote-header h2 {
+  margin: 0;
+}
+
+.tour-badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(91, 75, 219, 0.12);
+  color: var(--primary);
 }
 </style>
