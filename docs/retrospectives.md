@@ -52,3 +52,7 @@ Parmi la programmation par paires, les tests écrits avant le code, l'intégrati
 - Tâches où elle a fait gagner du temps, et tâches où elle en a fait perdre (d'après `AI_LOG.md`) :
 - Nombre de propositions rejetées ou corrigées :
 - Ce que nous ferions différemment :
+
+---
+
+### Lien du Run de la CI avec son étape de documentation : https://github.com/barriefl/projet-capi/actions/runs/45228907447
