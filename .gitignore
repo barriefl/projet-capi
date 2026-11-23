@@ -36,3 +36,5 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+# par la ci ne pas commit la doc
+site
